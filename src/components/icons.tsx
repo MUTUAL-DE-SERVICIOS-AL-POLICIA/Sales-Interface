@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { IconSvgProps } from "@/types";
+import { IconSvgProps } from "@/utils/types";
 
 export const MuserpolLogo = () => (
   <svg className="flex flex-row w-full h-20 m-2" viewBox="0 0 200 60">
