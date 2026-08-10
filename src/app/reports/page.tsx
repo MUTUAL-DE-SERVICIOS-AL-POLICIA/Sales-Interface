@@ -11,7 +11,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 
-import { ReportIcon } from "@/components";
+import { PdfIcon, ExcelIcon } from "@/components";
 import { apiClient } from "@/services";
 
 export default function Persons() {
@@ -21,11 +21,11 @@ export default function Persons() {
   const [dateTo, setDateTo] = useState(dateNow);
   const [, setLoading] = useState(false);
 
-  const downloadPdf = async (report: string) => {
+  const downloadReportAllSales = async (format: string) => {
     try {
       setLoading(true);
       const response = await apiClient.GET(
-        `sales/reports/${report}?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        `sales/reports/allSales?dateFrom=${dateFrom}&dateTo=${dateTo}&format=${format}`,
       );
 
       if (!response.ok) {
@@ -90,29 +90,31 @@ export default function Persons() {
         </Card>
       </div>
       <Card className="card-no-outline flex-1 border-2 p-3 min-w-162.5 h-full">
-        <div className="flex h-full gap-2">
-          <div className="flex w-1/4 flex-col gap-1 overflow-y-auto overflow-x-hidden">
+        <div className="flex w-1/2 flex-col h-full gap-2">
+          <div className="font-bold">Formato en PDF</div>
+          <div className="flex w-1/2 flex-col gap-1 overflow-y-auto overflow-x-hidden">
             <Button
               variant="tertiary"
               onPress={() => {
-                downloadPdf("allSales");
+                downloadReportAllSales("pdf");
               }}
             >
-              <ReportIcon />
+              <PdfIcon />
               Reporte de ventas
             </Button>
           </div>
         </div>
         <Separator orientation="vertical" />
-        <div className="flex w-3/4 flex-col h-full">
+        <div className="flex w-1/2 flex-col h-full">
+          <div className="font-bold">Formatos en EXCEL</div>
           <div className="flex flex-col h-4/5 rounded-lg">
             <Button
               variant="tertiary"
               onPress={() => {
-                downloadPdf("allSales");
+                downloadReportAllSales("xlsx");
               }}
             >
-              <ReportIcon />
+              <ExcelIcon />
               Reporte de ventas
             </Button>
           </div>

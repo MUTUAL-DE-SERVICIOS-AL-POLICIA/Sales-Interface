@@ -116,7 +116,7 @@ export const getPaymentTypes = async (): Promise<ResponseData> => {
 
 export const postCreateSale = async (body: any): Promise<ResponseData> => {
   try {
-    const response = await apiClient.POST(`sales/createSale`, body, true);
+    const response = await apiClient.POST(`sales/createSale`, body, false);
     const data = await response.json();
 
     if (!response.ok) {
@@ -143,7 +143,7 @@ export const postCreateSale = async (body: any): Promise<ResponseData> => {
 
 export const postGenerateQr = async (body: any): Promise<ResponseData> => {
   try {
-    const response = await apiClient.POST(`sales/generateQr`, body, true);
+    const response = await apiClient.POST(`sales/generateQr`, body, false);
     const data = await response.json();
 
     if (!response.ok) {
@@ -296,7 +296,7 @@ export const getVoucherPdf = async (saleId: string): Promise<ResponseData> => {
 
     return {
       error: false,
-      message: "Voucher generado con exito",
+      message: "Voucher generado con éxito",
       data: response,
     };
   } catch (e: any) {
