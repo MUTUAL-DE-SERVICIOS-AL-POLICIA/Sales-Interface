@@ -3,7 +3,7 @@
 import { Table, Tabs } from "@heroui/react";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Input, Button, Separator, Label, toast, Card } from "@heroui/react";
+import { Input, Button, Separator, Label, toast, Card, Surface } from "@heroui/react";
 import clsx from "clsx";
 import { ProgressCircle } from "@heroui/react";
 
@@ -48,6 +48,8 @@ export default function Page() {
   );
   const [isGenerateQr, setIsGenerateQr] = useState(false);
   const [imagenQr, setImagenQr] = useState<string>("");
+
+  const [receivedAmount, setReceivedAmount] = useState<number>(0);
 
   const [voucher, setVoucher] = useState<Voucher>({
     customer: "",
@@ -97,6 +99,8 @@ export default function Page() {
     (sum, product) => sum + Number(product.price) * product.amount,
     0,
   );
+
+  const change = receivedAmount - total;
 
   const createSale = async () => {
     try {
@@ -385,7 +389,6 @@ export default function Page() {
                   <Label className="mb-2 text-xl font-bold">
                     Seleccione tipo de pago:
                   </Label>
-
                   <div className="flex flex-1 flex-col">
                     <Tabs
                       className="w-full h-full"
@@ -432,7 +435,7 @@ export default function Page() {
             </div>
 
             <div className="flex h-1/5 flex-col  justify-end">
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between pt-4 ">
                 {isGenerateQr ? (
                   <Button
                     aria-label="Menu"
@@ -459,10 +462,32 @@ export default function Page() {
                 ) : (
                   <div className="w-2/5"> </div>
                 )}
-                <div className="flex h-3/8 text-5xl font-semibold capitalize">
-                  Total &nbsp;
-                  {parameters.currencySymbol}.
-                  <span className="ml-2">{total.toFixed(2)}</span>
+                <div className="grid grid-cols-[120px_50px_1fr] items-center gap-y-2">
+                  <span>Recibido</span>
+                  <span className="capitalize">{parameters.currencySymbol}.</span>
+                  <Input
+                    variant="secondary"
+                    className="w-full text-right"
+                    disabled={isGenerateQr || saleProducts.length === 0}
+                    onChange={(e) => {
+                      let amount = Number(e.target.value);
+
+                      amount = Math.max(0, amount);
+                      setReceivedAmount(amount);
+                    }}
+                  />
+
+                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold capitalize">{parameters.currencySymbol}.</span>
+                  <span className="text-right font-semibold">
+                    {total.toFixed(2)}
+                  </span>
+
+                  <span>Cambio</span>
+                  <span className="capitalize">{parameters.currencySymbol}.</span>
+                  <span className="text-right">
+                    {change.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
