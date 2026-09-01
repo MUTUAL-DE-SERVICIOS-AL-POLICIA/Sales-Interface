@@ -10,4 +10,8 @@ export {
   getPersonSales,
   getQrPending,
   getQrImage,
+  cancelSale,
+  getGroupsSelected,
 } from "./sales";
+
+export { getForGenerateReport } from "./reports";
