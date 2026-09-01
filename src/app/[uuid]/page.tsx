@@ -3,7 +3,7 @@
 import { Table, Tabs } from "@heroui/react";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Input, Button, Separator, Label, toast, Card, Surface } from "@heroui/react";
+import { Input, Button, Separator, Label, toast, Card } from "@heroui/react";
 import clsx from "clsx";
 import { ProgressCircle } from "@heroui/react";
 
@@ -100,7 +100,7 @@ export default function Page() {
     0,
   );
 
-  const change = receivedAmount - total;
+  const change = receivedAmount === 0 ? 0 : receivedAmount - total;
 
   const createSale = async () => {
     try {
@@ -177,6 +177,13 @@ export default function Page() {
       return false;
     }
 
+    if(paymentType != "QR"){
+      if(receivedAmount < total) {
+        toast.danger("El monto recibido es menor al total de la venta");
+        return false
+      }
+    }
+
     return true;
   };
 
@@ -207,6 +214,7 @@ export default function Page() {
       const { data: userCookie } = await getUserCookie();
 
       if (!validateData()) return;
+
       const body = {
         personId: person.id,
         parameterId: parameters.id,
@@ -214,6 +222,7 @@ export default function Page() {
         saleProducts: saleProducts,
         receptionist: userCookie.username,
       };
+
       const { error, message, data } = await postGenerateQr(body);
 
       if (error) {
@@ -463,27 +472,50 @@ export default function Page() {
                   <div className="w-2/5"> </div>
                 )}
                 <div className="grid grid-cols-[120px_50px_1fr] items-center gap-y-2">
-                  <span>Recibido</span>
+                  <span>RECIBIDO</span>
                   <span className="capitalize">{parameters.currencySymbol}.</span>
+
                   <Input
                     variant="secondary"
                     className="w-full text-right"
+                    type="text"
+                    inputMode="decimal"
                     disabled={isGenerateQr || saleProducts.length === 0}
+                    onKeyDown={(e) => {
+                      if (
+                        !/[0-9.,]/.test(e.key) &&
+                        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
                     onChange={(e) => {
-                      let amount = Number(e.target.value);
+                      let value = e.target.value;
 
-                      amount = Math.max(0, amount);
-                      setReceivedAmount(amount);
+                      // Convertir coma a punto
+                      value = value.replace(",", ".");
+
+                      // Eliminar caracteres que no sean números o punto
+                      value = value.replace(/[^0-9.]/g, "");
+
+                      // Permitir solamente un punto decimal
+                      const parts = value.split(".");
+
+                      if (parts.length > 2) {
+                        value = `${parts[0]}.${parts.slice(1).join("")}`;
+                      }
+
+                      setReceivedAmount(Number(value) || 0);
                     }}
                   />
 
-                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">TOTAL</span>
                   <span className="font-semibold capitalize">{parameters.currencySymbol}.</span>
                   <span className="text-right font-semibold">
                     {total.toFixed(2)}
                   </span>
 
-                  <span>Cambio</span>
+                  <span>CAMBIO</span>
                   <span className="capitalize">{parameters.currencySymbol}.</span>
                   <span className="text-right">
                     {change.toFixed(2)}

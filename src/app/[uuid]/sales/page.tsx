@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 import { useSales } from "@/context";
-import { getPersonSales } from "@/api";
+import { getPersonSales, cancelSale } from "@/api";
 import { Sale } from "@/utils/interfaces";
 import { EmptyContent, ButtonCancel, ButtonPrint } from "@/components";
 import { apiClient } from "@/services";
@@ -20,7 +20,7 @@ export default function Page() {
     try {
       setLoading(true);
       const { error, message, data } = await getPersonSales(key);
-
+      console.log(data);
       if (error) {
         toast.danger(message);
 
@@ -75,8 +75,17 @@ export default function Page() {
     }
   };
 
-  const handleCancel = async () => {
-    alert("cancelar venta");
+  const handleCancel = async (saleId: string) => {
+
+    const { error, message } = await cancelSale(saleId);
+
+    if (error) {
+      toast.danger(message);
+      return;
+    }
+
+    toast.success(message);
+    getSales(person.id);
   };
 
   useEffect(() => {
@@ -116,7 +125,7 @@ export default function Page() {
                   {sale.saleProducts.map((product) => (
                     <div key={product.id} className="flex flex-col gap-1">
                       <span className="text-md font-bold text-foreground">
-                        {product.amount} {product.name}
+                        {product.amount} {product.name} - #{product.fileNumber?.fileNumber}
                       </span>
                     </div>
                   ))}
@@ -143,7 +152,7 @@ export default function Page() {
                       isIconOnly
                       onPress={() => handlePrint(String(sale.id))}
                     />
-                    <ButtonCancel isIconOnly onPress={handleCancel} />
+                    <ButtonCancel isIconOnly onPress={() => handleCancel(String(sale.id))} />
                   </div>
                 </Card.Footer>
               </div>
