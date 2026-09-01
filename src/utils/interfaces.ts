@@ -56,6 +56,17 @@ export interface SaleProduct {
   amount: number;
   total?: number;
   saleId?: number;
+  fileNumber?: FileNumber;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface FileNumber {
+  id: number;
+  sale_id: number;
+  product_id: number;
+  fileNumber: number;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
