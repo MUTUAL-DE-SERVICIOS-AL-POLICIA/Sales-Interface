@@ -45,14 +45,14 @@ export interface Products {
   id: number;
   name: string;
   code?: string;
-  price: number;
+  price: number | string;
 }
 
 export interface SaleProduct {
   id?: number;
   productId: number;
   name: string;
-  price: number;
+  price: number | string;
   amount: number;
   total?: number;
   saleId?: number;
