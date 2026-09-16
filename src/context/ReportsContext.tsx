@@ -5,7 +5,6 @@ import { createContext, useContext, ReactNode } from "react";
 import { Groups } from "@/utils/interfaces";
 
 interface ReportsContextProps {
-
   groups: Groups[];
 }
 
@@ -13,13 +12,15 @@ interface ReportsProviderProps extends ReportsContextProps {
   children: ReactNode;
 }
 
-const ReportsContext = createContext<ReportsContextProps | undefined>(undefined);
+const ReportsContext = createContext<ReportsContextProps | undefined>(
+  undefined,
+);
 
 ReportsContext.displayName = "ReportsContext";
 
 export function ReportsProvider({ groups, children }: ReportsProviderProps) {
   return (
-    <ReportsContext.Provider value={{ groups }} >
+    <ReportsContext.Provider value={{ groups }}>
       {children}
     </ReportsContext.Provider>
   );
