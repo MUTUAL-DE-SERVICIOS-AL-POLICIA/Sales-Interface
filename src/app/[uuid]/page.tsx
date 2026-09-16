@@ -108,6 +108,9 @@ export default function Page() {
       const { data } = await getUserCookie();
       const body = {
         personId: person.id,
+        fullName: person.fullName,
+        identityCard: person.identityCard,
+        nup: person.nup,
         parameterId: parameters.id,
         paymentTypeId: paymentTypeId,
         saleProducts: saleProducts,
@@ -177,10 +180,11 @@ export default function Page() {
       return false;
     }
 
-    if(paymentType != "QR"){
-      if(receivedAmount < total) {
+    if (paymentType != "QR") {
+      if (receivedAmount < total) {
         toast.danger("El monto recibido es menor al total de la venta");
-        return false
+
+        return false;
       }
     }
 
@@ -217,6 +221,9 @@ export default function Page() {
 
       const body = {
         personId: person.id,
+        fullName: person.fullName,
+        identityCard: person.identityCard,
+        nup: person.nup,
         parameterId: parameters.id,
         paymentTypeId: paymentTypeId,
         saleProducts: saleProducts,
@@ -473,53 +480,55 @@ export default function Page() {
                 )}
                 <div className="grid grid-cols-[120px_50px_1fr] items-center gap-y-2">
                   <span>RECIBIDO</span>
-                  <span className="capitalize">{parameters.currencySymbol}.</span>
-
+                  <span className="capitalize">
+                    {parameters.currencySymbol}.
+                  </span>
                   <Input
-                    variant="secondary"
                     className="w-full text-right"
-                    type="text"
-                    inputMode="decimal"
                     disabled={isGenerateQr || saleProducts.length === 0}
-                    onKeyDown={(e) => {
-                      if (
-                        !/[0-9.,]/.test(e.key) &&
-                        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
+                    inputMode="decimal"
+                    type="text"
+                    variant="secondary"
                     onChange={(e) => {
                       let value = e.target.value;
 
-                      // Convertir coma a punto
                       value = value.replace(",", ".");
-
-                      // Eliminar caracteres que no sean números o punto
                       value = value.replace(/[^0-9.]/g, "");
-
-                      // Permitir solamente un punto decimal
                       const parts = value.split(".");
 
                       if (parts.length > 2) {
                         value = `${parts[0]}.${parts.slice(1).join("")}`;
                       }
-
                       setReceivedAmount(Number(value) || 0);
                     }}
+                    onKeyDown={(e) => {
+                      if (
+                        !/[0-9.,]/.test(e.key) &&
+                        ![
+                          "Backspace",
+                          "Delete",
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "Tab",
+                        ].includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
                   />
-
                   <span className="font-semibold">TOTAL</span>
-                  <span className="font-semibold capitalize">{parameters.currencySymbol}.</span>
+                  <span className="font-semibold capitalize">
+                    {parameters.currencySymbol}.
+                  </span>
                   <span className="text-right font-semibold">
                     {total.toFixed(2)}
                   </span>
 
                   <span>CAMBIO</span>
-                  <span className="capitalize">{parameters.currencySymbol}.</span>
-                  <span className="text-right">
-                    {change.toFixed(2)}
+                  <span className="capitalize">
+                    {parameters.currencySymbol}.
                   </span>
+                  <span className="text-right">{change.toFixed(2)}</span>
                 </div>
               </div>
             </div>
