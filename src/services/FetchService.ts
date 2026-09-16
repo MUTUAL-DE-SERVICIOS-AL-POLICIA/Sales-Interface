@@ -28,7 +28,11 @@ export class FetchService extends APIConnection {
     return this.handleRequest(url, requestConfig);
   }
 
-  async POST(endpoint: string, body: any, isFormData: boolean = false): Promise<any> {
+  async POST(
+    endpoint: string,
+    body: any,
+    isFormData: boolean = false,
+  ): Promise<any> {
     const headers = isFormData ? null : "application/json";
     const requestConfig = this.addInterceptors(
       {
@@ -52,7 +56,11 @@ export class FetchService extends APIConnection {
     return this.handleRequest(endpoint, requestConfig);
   }
 
-  async PATCH(endpoint: string, body: any, isFormData: boolean = false): Promise<any> {
+  async PATCH(
+    endpoint: string,
+    body: any,
+    isFormData: boolean = false,
+  ): Promise<any> {
     const headers = isFormData ? null : "application/json";
 
     const requestConfig = this.addInterceptors(
