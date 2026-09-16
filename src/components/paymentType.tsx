@@ -47,21 +47,15 @@ export const PaymentType = ({
           </Surface>
 
           <Surface className="flex w-full items-center justify-center rounded-xl bg-surface">
-            <Label className="w-1/4"># de carnet de identidad del depositante</Label>
+            <Label className="w-1/4">
+              # de carnet de identidad del depositante
+            </Label>
             <Input
               className="w-3/4"
               inputMode="numeric"
               type="text"
               value={voucher.identityCardCustomer}
               variant="secondary"
-              onKeyDown={(e) => {
-                if (
-                  !/[0-9]/.test(e.key) &&
-                  !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)
-                ) {
-                  e.preventDefault();
-                }
-              }}
               onChange={(e) => {
                 const value = e.target.value.replace(/[^0-9]/g, "");
 
@@ -69,6 +63,20 @@ export const PaymentType = ({
                   ...voucher,
                   identityCardCustomer: value,
                 });
+              }}
+              onKeyDown={(e) => {
+                if (
+                  !/[0-9]/.test(e.key) &&
+                  ![
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                  ].includes(e.key)
+                ) {
+                  e.preventDefault();
+                }
               }}
             />
           </Surface>
