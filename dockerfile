@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm && pnpm config set minimumReleaseAge 0 && pnpm i --frozen-lockfile --ignore-scripts
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate && pnpm config set minimumReleaseAge 0 && pnpm i --frozen-lockfile --ignore-scripts
 
 COPY . .
