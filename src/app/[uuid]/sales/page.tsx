@@ -2,30 +2,37 @@
 
 import Image from "next/image";
 import { Card, toast } from "@heroui/react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { useSales } from "@/context";
 import { getPersonSales, cancelSale } from "@/api";
 import { Sale } from "@/utils/interfaces";
-import { EmptyContent, ButtonCancel, ButtonPrint } from "@/components";
+import {
+  EmptyContent,
+  ButtonCancel,
+  ButtonPrint,
+  ModalAlert,
+} from "@/components";
 import { apiClient } from "@/services";
 
 export default function Page() {
   const { person } = useSales();
   const [personSales, setPersonSales] = useState<Sale[]>([]);
   const [, setLoading] = useState(false);
+  const [openModalAlert, setOpenModalAlert] = useState(false);
+  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
 
   const getSales = async (key: string) => {
     try {
       setLoading(true);
       const { error, message, data } = await getPersonSales(key);
-      console.log(data);
+
       if (error) {
         toast.danger(message);
 
         return;
       }
+
       setPersonSales(data);
     } finally {
       setLoading(false);
@@ -63,7 +70,6 @@ export default function Page() {
 
         win.focus();
 
-        // Espera un poco para que el visor PDF termine de cargar
         setTimeout(() => {
           win.print();
         }, 500);
@@ -76,11 +82,11 @@ export default function Page() {
   };
 
   const handleCancel = async (saleId: string) => {
-
     const { error, message } = await cancelSale(saleId);
 
     if (error) {
       toast.danger(message);
+
       return;
     }
 
@@ -116,7 +122,13 @@ export default function Page() {
               <div className="flex flex-1 flex-col gap-3">
                 <Card.Header className="gap-1">
                   <Card.Title className="pr-8" />
-                  <Card.Description className="font-bold text-blue-800">
+                  <Card.Description
+                    className={`font-bold ${
+                      sale.saleState === "ANULADO"
+                        ? "text-red-600"
+                        : "text-blue-800"
+                    }`}
+                  >
                     COD: {sale.code}
                     &nbsp; - &nbsp; ESTADO: {sale.saleState}
                   </Card.Description>
@@ -125,7 +137,8 @@ export default function Page() {
                   {sale.saleProducts.map((product) => (
                     <div key={product.id} className="flex flex-col gap-1">
                       <span className="text-md font-bold text-foreground">
-                        {product.amount} {product.name} - #{product.fileNumber?.fileNumber}
+                        {product.amount} {product.name} - #
+                        {product.fileNumber?.fileNumber}
                       </span>
                     </div>
                   ))}
@@ -152,7 +165,13 @@ export default function Page() {
                       isIconOnly
                       onPress={() => handlePrint(String(sale.id))}
                     />
-                    <ButtonCancel isIconOnly onPress={() => handleCancel(String(sale.id))} />
+                    <ButtonCancel
+                      isIconOnly
+                      onPress={() => {
+                        setSelectedSaleId(String(sale.id));
+                        setOpenModalAlert(true);
+                      }}
+                    />
                   </div>
                 </Card.Footer>
               </div>
@@ -160,6 +179,19 @@ export default function Page() {
           ))}
         </>
       )}
+
+      <ModalAlert
+        cancelText="Cancelar"
+        confirmText="Sí, anular recibo"
+        isOpen={openModalAlert}
+        message={`¿Está seguro que desea anular este recibo?`}
+        title={`Anular Recibo`}
+        onClose={() => setOpenModalAlert(false)}
+        onConfirm={() => {
+          handleCancel(String(selectedSaleId));
+          setOpenModalAlert(false);
+        }}
+      />
     </>
   );
 }

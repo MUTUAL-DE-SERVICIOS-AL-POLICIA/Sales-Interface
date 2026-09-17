@@ -24,7 +24,9 @@ export const getForGenerateReport = async (): Promise<ResponseData> => {
   } catch (error: any) {
     return {
       error: true,
-      message: "Error al obtener datos para la generación de reportes: " + error.message,
+      message:
+        "Error al obtener datos para la generación de reportes: " +
+        error.message,
       data: error.message,
     };
   }

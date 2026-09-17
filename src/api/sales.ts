@@ -37,7 +37,7 @@ export const searchPerson = async (value: string, type: string) => {
     const response = await apiClient.GET(`sales/search/${value}/${type}`);
 
     const data = await response.json();
-    console.log("data", data);
+
     if (!response.ok) {
       return {
         error: true,
@@ -62,7 +62,6 @@ export const getGroupProducts = async (
   productIds: string,
 ): Promise<ResponseData> => {
   try {
-    console.log("productIds", productIds);
     const response = await apiClient.GET(`sales/groups/${productIds}/products`);
     const data = await response.json();
 
@@ -94,7 +93,7 @@ export const getGroupsSelected = async (
   try {
     const response = await apiClient.GET(`sales/groups/${groupIds}`);
     const data = await response.json();
-    console.log("data", data);
+
     if (!response.ok) {
       return {
         error: true,
@@ -143,7 +142,6 @@ export const getPaymentTypes = async (): Promise<ResponseData> => {
     };
   }
 };
-
 
 export const postCreateSale = async (body: any): Promise<ResponseData> => {
   try {
@@ -234,6 +232,7 @@ export const getPersonSales = async (
   try {
     const response = await apiClient.GET(`sales/${personId}/sales`);
     const data = await response.json();
+
     if (!response.ok) {
       return {
         error: true,
@@ -340,10 +339,7 @@ export const getVoucherPdf = async (saleId: string): Promise<ResponseData> => {
 
 export const cancelSale = async (saleId: string): Promise<ResponseData> => {
   try {
-
-    const response = await apiClient.GET(
-      `sales/cancel/${saleId}`,
-    );
+    const response = await apiClient.GET(`sales/cancel/${saleId}`);
 
     const data = await response.json();
 

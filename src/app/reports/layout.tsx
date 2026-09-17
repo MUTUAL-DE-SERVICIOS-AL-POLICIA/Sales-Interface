@@ -3,10 +3,12 @@ export const dynamic = "force-dynamic";
 import { getForGenerateReport } from "@/api";
 import { ReportsProvider } from "@/context";
 
-
-export default async function Layout({children}: {children: React.ReactNode;}) {
-
-  const { error, message, data } = await getForGenerateReport();
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { data } = await getForGenerateReport();
 
   return (
     <div className="ml-2 mr-2 my-2">
