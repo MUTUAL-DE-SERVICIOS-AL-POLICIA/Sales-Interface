@@ -45,17 +45,28 @@ export interface Products {
   id: number;
   name: string;
   code?: string;
-  price: number;
+  price: number | string;
 }
 
 export interface SaleProduct {
   id?: number;
   productId: number;
   name: string;
-  price: number;
+  price: number | string;
   amount: number;
   total?: number;
   saleId?: number;
+  fileNumber?: FileNumber;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface FileNumber {
+  id: number;
+  sale_id: number;
+  product_id: number;
+  fileNumber: number;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;

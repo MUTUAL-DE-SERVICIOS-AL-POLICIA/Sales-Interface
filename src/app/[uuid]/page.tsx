@@ -49,6 +49,8 @@ export default function Page() {
   const [isGenerateQr, setIsGenerateQr] = useState(false);
   const [imagenQr, setImagenQr] = useState<string>("");
 
+  const [receivedAmount, setReceivedAmount] = useState<number>(0);
+
   const [voucher, setVoucher] = useState<Voucher>({
     customer: "",
     identityCardCustomer: "",
@@ -98,12 +100,17 @@ export default function Page() {
     0,
   );
 
+  const change = receivedAmount === 0 ? 0 : receivedAmount - total;
+
   const createSale = async () => {
     try {
       setLoading(true);
       const { data } = await getUserCookie();
       const body = {
         personId: person.id,
+        fullName: person.fullName,
+        identityCard: person.identityCard,
+        nup: person.nup,
         parameterId: parameters.id,
         paymentTypeId: paymentTypeId,
         saleProducts: saleProducts,
@@ -173,6 +180,14 @@ export default function Page() {
       return false;
     }
 
+    if (paymentType != "QR") {
+      if (receivedAmount < total) {
+        toast.danger("El monto recibido es menor al total de la venta");
+
+        return false;
+      }
+    }
+
     return true;
   };
 
@@ -203,13 +218,18 @@ export default function Page() {
       const { data: userCookie } = await getUserCookie();
 
       if (!validateData()) return;
+
       const body = {
         personId: person.id,
+        fullName: person.fullName,
+        identityCard: person.identityCard,
+        nup: person.nup,
         parameterId: parameters.id,
         paymentTypeId: paymentTypeId,
         saleProducts: saleProducts,
         receptionist: userCookie.username,
       };
+
       const { error, message, data } = await postGenerateQr(body);
 
       if (error) {
@@ -385,7 +405,6 @@ export default function Page() {
                   <Label className="mb-2 text-xl font-bold">
                     Seleccione tipo de pago:
                   </Label>
-
                   <div className="flex flex-1 flex-col">
                     <Tabs
                       className="w-full h-full"
@@ -432,7 +451,7 @@ export default function Page() {
             </div>
 
             <div className="flex h-1/5 flex-col  justify-end">
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between pt-4 ">
                 {isGenerateQr ? (
                   <Button
                     aria-label="Menu"
@@ -459,10 +478,57 @@ export default function Page() {
                 ) : (
                   <div className="w-2/5"> </div>
                 )}
-                <div className="flex h-3/8 text-5xl font-semibold capitalize">
-                  Total &nbsp;
-                  {parameters.currencySymbol}.
-                  <span className="ml-2">{total.toFixed(2)}</span>
+                <div className="grid grid-cols-[120px_50px_1fr] items-center gap-y-2">
+                  <span>RECIBIDO</span>
+                  <span className="capitalize">
+                    {parameters.currencySymbol}.
+                  </span>
+                  <Input
+                    className="w-full text-right"
+                    disabled={isGenerateQr || saleProducts.length === 0}
+                    inputMode="decimal"
+                    type="text"
+                    variant="secondary"
+                    onChange={(e) => {
+                      let value = e.target.value;
+
+                      value = value.replace(",", ".");
+                      value = value.replace(/[^0-9.]/g, "");
+                      const parts = value.split(".");
+
+                      if (parts.length > 2) {
+                        value = `${parts[0]}.${parts.slice(1).join("")}`;
+                      }
+                      setReceivedAmount(Number(value) || 0);
+                    }}
+                    onKeyDown={(e) => {
+                      if (
+                        !/[0-9.,]/.test(e.key) &&
+                        ![
+                          "Backspace",
+                          "Delete",
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "Tab",
+                        ].includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                  <span className="font-semibold">TOTAL</span>
+                  <span className="font-semibold capitalize">
+                    {parameters.currencySymbol}.
+                  </span>
+                  <span className="text-right font-semibold">
+                    {total.toFixed(2)}
+                  </span>
+
+                  <span>CAMBIO</span>
+                  <span className="capitalize">
+                    {parameters.currencySymbol}.
+                  </span>
+                  <span className="text-right">{change.toFixed(2)}</span>
                 </div>
               </div>
             </div>

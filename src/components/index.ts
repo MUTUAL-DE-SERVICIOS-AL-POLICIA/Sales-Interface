@@ -41,6 +41,8 @@ export {
   ArrowUpLargeIcon,
   PrintIcon,
   ReportIcon,
+  PdfIcon,
+  ExcelIcon,
 } from "./icons";
 
 export { ButtonEdit } from "./buttonEdit";

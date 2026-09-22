@@ -59,10 +59,39 @@ export const searchPerson = async (value: string, type: string) => {
 };
 
 export const getGroupProducts = async (
-  groupId: string,
+  productIds: string,
 ): Promise<ResponseData> => {
   try {
-    const response = await apiClient.GET(`sales/groups/${groupId}/products`);
+    const response = await apiClient.GET(`sales/groups/${productIds}/products`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: "Ocurrió un error",
+        data: response.statusText,
+      };
+    }
+
+    return {
+      error: data.error,
+      message: data.message,
+      data: data.data,
+    };
+  } catch (e: any) {
+    return {
+      error: true,
+      message: "Error al obtener datos de los grupos",
+      data: e.message,
+    };
+  }
+};
+
+export const getGroupsSelected = async (
+  groupIds: string[],
+): Promise<ResponseData> => {
+  try {
+    const response = await apiClient.GET(`sales/groups/${groupIds}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -116,7 +145,7 @@ export const getPaymentTypes = async (): Promise<ResponseData> => {
 
 export const postCreateSale = async (body: any): Promise<ResponseData> => {
   try {
-    const response = await apiClient.POST(`sales/createSale`, body, true);
+    const response = await apiClient.POST(`sales/createSale`, body, false);
     const data = await response.json();
 
     if (!response.ok) {
@@ -143,7 +172,7 @@ export const postCreateSale = async (body: any): Promise<ResponseData> => {
 
 export const postGenerateQr = async (body: any): Promise<ResponseData> => {
   try {
-    const response = await apiClient.POST(`sales/generateQr`, body, true);
+    const response = await apiClient.POST(`sales/generateQr`, body, false);
     const data = await response.json();
 
     if (!response.ok) {
@@ -296,13 +325,41 @@ export const getVoucherPdf = async (saleId: string): Promise<ResponseData> => {
 
     return {
       error: false,
-      message: "Voucher generado con exito",
+      message: "Voucher generado con éxito",
       data: response,
     };
   } catch (e: any) {
     return {
       error: true,
       message: "Error al obtener pdf de la venta",
+      data: e.message,
+    };
+  }
+};
+
+export const cancelSale = async (saleId: string): Promise<ResponseData> => {
+  try {
+    const response = await apiClient.GET(`sales/cancel/${saleId}`);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: "Ocurrió un error",
+        data: response.statusText,
+      };
+    }
+
+    return {
+      error: data.error,
+      message: data.message,
+      data: data.data,
+    };
+  } catch (e: any) {
+    return {
+      error: true,
+      message: "Error al anular la venta",
       data: e.message,
     };
   }

@@ -38,7 +38,6 @@ export const CopyButton = ({ text = "" }: Props) => {
       textarea.focus();
       textarea.select();
 
-      // @ts-expect-error deprecated fallback legacy
       document.execCommand("copy");
 
       textarea.remove();
