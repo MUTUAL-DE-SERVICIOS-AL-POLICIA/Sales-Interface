@@ -1,7 +1,7 @@
 "use server";
 
 import { ResponseData } from "@/utils/interfaces";
-import { apiClient } from "@/utils/services";
+import { apiClient } from "@/utils/services/GatewayServerClient";
 
 export const getForGenerateReport = async (): Promise<ResponseData> => {
   try {

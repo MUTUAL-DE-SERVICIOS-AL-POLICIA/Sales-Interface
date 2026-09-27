@@ -1,7 +1,7 @@
 "use server";
 
 import { ResponseData } from "@/utils/interfaces";
-import { apiClient } from "@/utils/services";
+import { apiClient } from "@/utils/services/GatewayServerClient";
 import { getUserContext } from "@/api/auth/context";
 
 export const getForCreatingSale = async (
