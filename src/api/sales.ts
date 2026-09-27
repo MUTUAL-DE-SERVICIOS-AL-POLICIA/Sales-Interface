@@ -1,7 +1,8 @@
 "use server";
 
 import { ResponseData } from "@/utils/interfaces";
-import { apiClient } from "@/services";
+import { apiClient } from "@/utils/services";
+import { getUserContext } from "@/api/auth/context";
 
 export const getForCreatingSale = async (
   personUuid: string,
@@ -145,7 +146,13 @@ export const getPaymentTypes = async (): Promise<ResponseData> => {
 
 export const postCreateSale = async (body: any): Promise<ResponseData> => {
   try {
-    const response = await apiClient.POST(`sales/createSale`, body, false);
+    const context = await getUserContext();
+    const receptionist =
+      context.identity.preferredUsername ?? context.identity.sub;
+    const response = await apiClient.POST(`sales/createSale`, {
+      ...body,
+      receptionist,
+    });
     const data = await response.json();
 
     if (!response.ok) {
@@ -172,7 +179,13 @@ export const postCreateSale = async (body: any): Promise<ResponseData> => {
 
 export const postGenerateQr = async (body: any): Promise<ResponseData> => {
   try {
-    const response = await apiClient.POST(`sales/generateQr`, body, false);
+    const context = await getUserContext();
+    const receptionist =
+      context.identity.preferredUsername ?? context.identity.sub;
+    const response = await apiClient.POST(`sales/generateQr`, {
+      ...body,
+      receptionist,
+    });
     const data = await response.json();
 
     if (!response.ok) {

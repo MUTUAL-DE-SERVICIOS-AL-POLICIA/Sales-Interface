@@ -1,7 +1,7 @@
 "use server";
 
 import { ResponseData } from "@/utils/interfaces";
-import { apiClient } from "@/services";
+import { apiClient } from "@/utils/services";
 
 export const getForGenerateReport = async (): Promise<ResponseData> => {
   try {

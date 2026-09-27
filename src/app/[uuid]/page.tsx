@@ -18,7 +18,7 @@ import {
 import { useSales } from "@/context";
 import { getGroupProducts, postCreateSale, postGenerateQr } from "@/api";
 import { Products, Voucher, SaleProduct } from "@/utils/interfaces";
-import { getUserCookie } from "@/utils";
+import { usePermissions } from "@/utils/context/PermissionContext";
 
 const columns = [
   { id: "actions", name: "Acciones" },
@@ -30,6 +30,7 @@ const columns = [
 
 export default function Page() {
   const { uuid } = useParams();
+  const { can } = usePermissions();
   const router = useRouter();
   const { parameters, paymentTypes, person, groups } = useSales();
   const [, setLoading] = useState(false);
@@ -105,7 +106,6 @@ export default function Page() {
   const createSale = async () => {
     try {
       setLoading(true);
-      const { data } = await getUserCookie();
       const body = {
         personId: person.id,
         fullName: person.fullName,
@@ -115,7 +115,6 @@ export default function Page() {
         paymentTypeId: paymentTypeId,
         saleProducts: saleProducts,
         voucher: voucher,
-        receptionist: data.username,
       };
       const { error, message } = await postCreateSale(body);
 
@@ -215,8 +214,6 @@ export default function Page() {
   const generateQr = async () => {
     try {
       setLoadingQr(true);
-      const { data: userCookie } = await getUserCookie();
-
       if (!validateData()) return;
 
       const body = {
@@ -227,7 +224,6 @@ export default function Page() {
         parameterId: parameters.id,
         paymentTypeId: paymentTypeId,
         saleProducts: saleProducts,
-        receptionist: userCookie.username,
       };
 
       const { error, message, data } = await postGenerateQr(body);
@@ -281,7 +277,7 @@ export default function Page() {
                 <ButtonCard
                   key={product.id}
                   currencySymbol={parameters.currencySymbol}
-                  disabled={isGenerateQr}
+                  disabled={isGenerateQr || !can("sales", "write")}
                   isSelected={saleProducts.some(
                     (p) => p.productId === product.id,
                   )}
@@ -337,7 +333,9 @@ export default function Page() {
                               <Table.Cell>{product.price}</Table.Cell>
                               <Table.Cell>
                                 <Input
-                                  disabled={isGenerateQr}
+                                  disabled={
+                                    isGenerateQr || !can("sales", "write")
+                                  }
                                   max={parameters.maxAmountProduct}
                                   min={1}
                                   type="number"
