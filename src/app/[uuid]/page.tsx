@@ -104,6 +104,10 @@ export default function Page() {
   const change = receivedAmount === 0 ? 0 : receivedAmount - total;
 
   const createSale = async () => {
+    if (!can("sales", "write")) {
+      toast.danger("No tiene permiso para registrar ventas");
+      return;
+    }
     try {
       setLoading(true);
       const body = {
@@ -212,6 +216,10 @@ export default function Page() {
   };
 
   const generateQr = async () => {
+    if (!can("sales.qr", "write")) {
+      toast.danger("No tiene permiso para generar códigos QR");
+      return;
+    }
     try {
       setLoadingQr(true);
       if (!validateData()) return;
