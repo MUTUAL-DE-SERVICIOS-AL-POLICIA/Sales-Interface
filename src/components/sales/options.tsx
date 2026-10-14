@@ -6,8 +6,10 @@ import { useRouter, useParams } from "next/navigation";
 import { getSalesRecords } from "@/api";
 import { DrawerRecords } from "@/components";
 import { useSales } from "@/context";
+import { usePermissions } from "@/utils/context/PermissionContext";
 
 export const Options = () => {
+  const { can } = usePermissions();
   const [dataRecords, setDataRecords] = useState<any[]>([]);
   const { person } = useSales();
   const router = useRouter();
@@ -27,21 +29,27 @@ export const Options = () => {
   return (
     <div className="flex justify-end items-center gap-1">
       <div className="flex gap-1">
-        <Button
-          className="border-2"
-          variant="outline"
-          onClick={() => router.push(`/${uuid}/sales`)}
-        >
-          Ver registros
-        </Button>
-        <Button
-          className="border-2"
-          variant="outline"
-          onClick={() => router.push(`/${uuid}/pending`)}
-        >
-          Ver pendientes
-        </Button>
-        <DrawerRecords data={dataRecords} getData={handlePress} />
+        {can("sales", "read") && (
+          <Button
+            className="border-2"
+            variant="outline"
+            onClick={() => router.push(`/${uuid}/sales`)}
+          >
+            Ver ventas
+          </Button>
+        )}
+        {can("sales.qr", "read") && (
+          <Button
+            className="border-2"
+            variant="outline"
+            onClick={() => router.push(`/${uuid}/pending`)}
+          >
+            Ver pendientes
+          </Button>
+        )}
+        {can("sales.records", "read") && (
+          <DrawerRecords data={dataRecords} getData={handlePress} />
+        )}
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 import { PdfIcon, ExcelIcon } from "@/components";
-import { apiClient } from "@/services";
+import { usePermissions } from "@/utils/context/PermissionContext";
 import { useReports } from "@/context";
 import { getGroupsSelected } from "@/api";
 import { Products } from "@/utils/interfaces";
@@ -45,6 +45,7 @@ const listClassName = [
 ].join(" ");
 
 export default function Persons() {
+  const { can } = usePermissions();
   const dateNow = new Date().toISOString().split("T")[0];
 
   const [dateFrom, setDateFrom] = useState(dateNow);
@@ -57,12 +58,16 @@ export default function Persons() {
   const [format, setFormat] = useState<"pdf" | "csv">("pdf");
 
   const downloadReportAllSales = async () => {
+    if (!can("sales.reports", "download")) {
+      toast.danger("No tiene permiso para descargar reportes");
+      return;
+    }
     try {
       setLoading(true);
 
-      const api = `sales/reports/allSales?dateFrom=${dateFrom}&dateTo=${dateTo}&productIds=${selectedProducts.join(",")}&format=${format}`;
+      const api = `/api/sales/report?dateFrom=${dateFrom}&dateTo=${dateTo}&productIds=${selectedProducts.join(",")}&format=${format}`;
 
-      const response = await apiClient.GET(api);
+      const response = await fetch(api, { cache: "no-store" });
 
       if (!response.ok) {
         toast.danger("No se pudo generar el reporte");
@@ -226,7 +231,9 @@ export default function Persons() {
         <div className="flex w-full flex-col gap-1 overflow-y-auto overflow-x-hidden">
           <Button
             className="bg-emerald-100 border-2 hover:bg-emerald-200"
-            isDisabled={selectedProducts.length === 0}
+            isDisabled={
+              selectedProducts.length === 0 || !can("sales.reports", "download")
+            }
             variant="secondary"
             onPress={() => {
               downloadReportAllSales();
