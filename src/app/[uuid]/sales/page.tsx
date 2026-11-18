@@ -13,10 +13,11 @@ import {
   ButtonPrint,
   ModalAlert,
 } from "@/components";
-import { apiClient } from "@/services";
+import { usePermissions } from "@/utils/context/PermissionContext";
 
 export default function Page() {
   const { person } = useSales();
+  const { can } = usePermissions();
   const [personSales, setPersonSales] = useState<Sale[]>([]);
   const [, setLoading] = useState(false);
   const [openModalAlert, setOpenModalAlert] = useState(false);
@@ -41,9 +42,9 @@ export default function Page() {
 
   const handlePrint = async (saleId: string) => {
     try {
-      const response = await apiClient.GET(
-        `sales/voucherPdf/${saleId}?template=reciboPrueba`,
-      );
+      const response = await fetch(`/api/sales/voucher/${saleId}`, {
+        cache: "no-store",
+      });
 
       if (!response.ok) {
         toast.danger("No se pudo generar el PDF");
@@ -161,17 +162,21 @@ export default function Page() {
                     </span>
                   </div>
                   <div className="flex w-full flex-col gap-2 sm:flex-row sm:w-auto">
-                    <ButtonPrint
-                      isIconOnly
-                      onPress={() => handlePrint(String(sale.id))}
-                    />
-                    <ButtonCancel
-                      isIconOnly
-                      onPress={() => {
-                        setSelectedSaleId(String(sale.id));
-                        setOpenModalAlert(true);
-                      }}
-                    />
+                    {can("sales.vouchers", "download") && (
+                      <ButtonPrint
+                        isIconOnly
+                        onPress={() => handlePrint(String(sale.id))}
+                      />
+                    )}
+                    {can("sales", "update") && (
+                      <ButtonCancel
+                        isIconOnly
+                        onPress={() => {
+                          setSelectedSaleId(String(sale.id));
+                          setOpenModalAlert(true);
+                        }}
+                      />
+                    )}
                   </div>
                 </Card.Footer>
               </div>

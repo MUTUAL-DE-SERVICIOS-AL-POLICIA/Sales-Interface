@@ -1,25 +1,17 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
-export const proxy = async () => {
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get("msp");
-  const token = cookie?.value;
-  const host = process.env.NEXT_PUBLIC_FRONTEND_HOST || "";
-  const port = process.env.NEXT_PUBLIC_LOGIN_FRONTEND_PORT || "3001";
-  const url = "http://" + host + ":" + port + "/login";
-
+import type { NextRequest } from "next/server";
+import { hubPublicUrl } from "@/utils/helpers/urls";
+export const proxy = (request: NextRequest) => {
   try {
-    if (!token) {
-      return NextResponse.redirect(url);
-    }
-
+    if (!request.cookies.get("sid")?.value)
+      return NextResponse.redirect(hubPublicUrl("/apphub"));
     return NextResponse.next();
   } catch {
-    return NextResponse.redirect(url);
+    return new NextResponse("Servicio temporalmente no disponible", {
+      status: 503,
+    });
   }
 };
-
 export const config = {
   matcher: [
     "/((?!_next/|favicon.ico|static/|images/|fonts/|api/|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.webp|.*\\.gif|.*\\.ico).*)",

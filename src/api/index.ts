@@ -1,4 +1,3 @@
-export { logout } from "./auth";
 export {
   getForCreatingSale,
   searchPerson,

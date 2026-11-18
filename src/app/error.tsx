@@ -1,30 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
-
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    /* eslint-disable no-console */
-    console.error(error);
-  }, [error]);
-
+export default function Error({ reset }: { error: Error; reset: () => void }) {
   return (
-    <div>
-      <h2>Something went wrong!</h2>
+    <div className="flex min-h-48 flex-col items-center justify-center gap-3 p-6 text-center">
+      <h2 className="text-lg font-semibold">
+        No se pudo completar la operación.
+      </h2>
+      <p className="text-sm text-muted">
+        Intente nuevamente. Si el problema continúa, vuelva más tarde.
+      </p>
       <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
+        className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
+        onClick={reset}
       >
-        Try again
+        Volver a intentar
       </button>
     </div>
   );

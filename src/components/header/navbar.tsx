@@ -5,21 +5,26 @@ import { Link, Tooltip } from "@heroui/react";
 import { UserSession } from "./userSession";
 
 import { ThemeSwitch, Logo, Search } from "@/components";
-import { urlLogin } from "@/services";
 import { User } from "@/utils/interfaces";
-import { logout, searchPerson } from "@/api";
+import { usePermissions } from "@/utils/context/PermissionContext";
+import { searchPerson } from "@/api";
 
 interface Props {
   user: User;
   environment: string;
   computerToolName: string;
+  hubUrl: string;
+  logoutUrl: string;
 }
 
-export const Navbar = ({ user, environment, computerToolName }: Props) => {
-  const onLogout = async () => {
-    await logout();
-    window.location.href = `${urlLogin}/login`;
-  };
+export const Navbar = ({
+  user,
+  environment,
+  computerToolName,
+  hubUrl,
+  logoutUrl,
+}: Props) => {
+  const { can } = usePermissions();
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-separator bg-background/70 backdrop-blur-lg">
@@ -28,7 +33,7 @@ export const Navbar = ({ user, environment, computerToolName }: Props) => {
           <Tooltip delay={0}>
             <Link
               className="flex justify-start items-center gap-1"
-              href={`${urlLogin}/apphub`}
+              href={hubUrl}
             >
               <Logo height={30} width={80} />
             </Link>
@@ -55,19 +60,23 @@ export const Navbar = ({ user, environment, computerToolName }: Props) => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex flex-col items-center text-center leading-tight">
-            <Search searchPerson={searchPerson} />
-          </div>
+          {can("persons", "read") && (
+            <div className="flex flex-col items-center text-center leading-tight">
+              <Search searchPerson={searchPerson} />
+            </div>
+          )}
         </div>
 
         <div className="hidden sm:flex items-center gap-2">
           <ThemeSwitch />
           <div className="hidden md:flex">
             <UserSession
-              name={user?.name}
-              urlLogin={`${urlLogin}/login`}
-              username={user?.username}
-              onLogout={onLogout}
+              name={user.name}
+              username={user.username}
+              email={user.email}
+              groups={user.groups}
+              clientRoles={user.clientRoles}
+              logoutUrl={logoutUrl}
             />
           </div>
         </div>
